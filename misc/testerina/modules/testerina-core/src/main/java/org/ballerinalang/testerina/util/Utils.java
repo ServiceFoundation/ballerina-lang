@@ -23,17 +23,15 @@ import org.ballerinalang.testerina.core.TesterinaConstants;
 import org.ballerinalang.testerina.core.TesterinaRegistry;
 import org.ballerinalang.toml.model.Manifest;
 import org.ballerinalang.toml.parser.ManifestProcessor;
-import org.ballerinalang.util.BLangConstants;
 import org.ballerinalang.util.codegen.PackageInfo;
 import org.ballerinalang.util.codegen.ProgramFile;
 import org.ballerinalang.util.debugger.Debugger;
 import org.ballerinalang.util.exceptions.BallerinaException;
 import org.ballerinalang.util.program.BLangFunctions;
-import org.wso2.ballerinalang.compiler.FileSystemProjectDirectory;
-import org.wso2.ballerinalang.compiler.ListenerRegistry;
-import org.wso2.ballerinalang.compiler.SourceDirectory;
+import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 import org.wso2.ballerinalang.compiler.util.Names;
 import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
+import org.wso2.ballerinalang.programfile.CompiledBinaryFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +43,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility methods.
@@ -53,7 +52,6 @@ public class Utils {
 
     private static PrintStream errStream = System.err;
     private static TesterinaRegistry registry = TesterinaRegistry.getInstance();
-    private static PrintStream outStream = System.out;
 
     public static void startService(ProgramFile programFile) {
         if (!programFile.isServiceEPAvailable()) {
@@ -159,29 +157,14 @@ public class Utils {
         }
     }
 
-    /**
-     * Include tests into the build command.
-     *
-     * @param sourceRootPath source root path
-     * @param sourceFileList file list
-     */
-    public static void testWithBuild(Path sourceRootPath, List<String> sourceFileList) {
-        SourceDirectory srcDirectory;
-        if (sourceFileList == null || sourceFileList.isEmpty()) {
-            srcDirectory = new FileSystemProjectDirectory(sourceRootPath);
-            sourceFileList = srcDirectory.getSourcePackageNames();
-        } else if (sourceFileList.get(0).endsWith(BLangConstants.BLANG_SRC_FILE_SUFFIX)) {
-            ListenerRegistry.triggerLineBreak();
-            return;
-        }
-
+    public static void testWithBuild(Path sourceRootPath, Map<BLangPackage,
+            CompiledBinaryFile.ProgramFile> programFileMap) {
         LauncherUtils.loadConfigurations(sourceRootPath, new HashMap<>(), null, false);
 
-        Path[] paths = sourceFileList.stream().map(Paths::get).toArray(Path[]::new);
         Utils.setManifestConfigs();
 
         BTestRunner testRunner = new BTestRunner();
-        testRunner.runTest(sourceRootPath.toString(), paths, null, true, true);
+        testRunner.runTest(programFileMap);
 
         if (testRunner.getTesterinaReport().isFailure()) {
             Utils.cleanUpDir(sourceRootPath.resolve(TesterinaConstants.TESTERINA_TEMP_DIR));

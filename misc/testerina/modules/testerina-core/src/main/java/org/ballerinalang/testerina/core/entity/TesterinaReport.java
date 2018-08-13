@@ -21,7 +21,6 @@ package org.ballerinalang.testerina.core.entity;
 import org.ballerinalang.testerina.util.Utils;
 import org.wso2.ballerinalang.compiler.ListenerRegistry;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,6 @@ import java.util.Map;
  */
 public class TesterinaReport {
 
-    private static PrintStream outStream = System.err;
     private Map<String, TestSummary> testReportOfPackage = new HashMap<>();
     private boolean failure;
 

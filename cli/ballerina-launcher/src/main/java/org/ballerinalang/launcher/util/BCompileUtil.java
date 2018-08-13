@@ -205,7 +205,7 @@ public class BCompileUtil {
         options.put(COMPILER_PHASE, compilerPhase.toString());
         options.put(PRESERVE_WHITESPACE, "false");
 
-        return compile(context, packageName, compilerPhase);
+        return compile(context, packageName, compilerPhase, false);
     }
 
 
@@ -225,7 +225,7 @@ public class BCompileUtil {
         options.put(PRESERVE_WHITESPACE, "false");
         options.put(TEST_ENABLED, "true");
 
-        return compile(context, packageName, compilerPhase);
+        return compile(context, packageName, compilerPhase, true);
     }
 
     public static CompileResult compile(String sourceRoot, String packageName, CompilerPhase compilerPhase,
@@ -256,7 +256,7 @@ public class BCompileUtil {
     }
 
     private static CompileResult compile(CompilerContext context, String packageName,
-                                         CompilerPhase compilerPhase) {
+                                         CompilerPhase compilerPhase, boolean withTests) {
         CompileResult comResult = new CompileResult();
         // catch errors
         DiagnosticListener listener = comResult::addDiagnostic;
@@ -269,8 +269,16 @@ public class BCompileUtil {
         if (comResult.getErrorCount() > 0 || CompilerPhase.CODE_GEN.compareTo(compilerPhase) > 0) {
             return comResult;
         }
-
-        CompiledBinaryFile.ProgramFile programFile = compiler.getExecutableProgram(packageNode);
+        CompiledBinaryFile.ProgramFile programFile;
+        if (!withTests) {
+            programFile = compiler.getExecutableProgram(packageNode);
+        } else {
+            if (packageNode.testableBLangPackage != null) {
+                programFile = compiler.getExecutableProgram(packageNode.testableBLangPackage);
+            } else {
+                programFile = compiler.getExecutableProgram(packageNode);
+            }
+        }
         if (programFile != null) {
             ProgramFile pFile = LauncherUtils.getExecutableProgram(programFile);
             comResult.setProgFile(pFile);

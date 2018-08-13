@@ -60,7 +60,7 @@ public class BLangPackage extends BLangNode implements PackageNode {
     public Set<CompilerPhase> completedPhases;
     public List<BSymbol> objAttachedFunctions;
     public List<TopLevelNode> topLevelNodes;
-
+    public TestableBLangPackage testableBLangPackage;
     public PackageID packageID;
     public BPackageSymbol symbol;
     public PackageRepository packageRepository;
@@ -85,6 +85,15 @@ public class BLangPackage extends BLangNode implements PackageNode {
         this.topLevelNodes = new ArrayList<>();
         this.completedPhases = EnumSet.noneOf(CompilerPhase.class);
         this.diagCollector = new BDiagnosticCollector();
+        this.testableBLangPackage = null;
+    }
+
+    public TestableBLangPackage getTestableBLangPackage() {
+        return testableBLangPackage;
+    }
+
+    public void setTestableBLangPackage(TestableBLangPackage testableBLangPackage) {
+        this.testableBLangPackage = testableBLangPackage;
     }
 
     @Override
