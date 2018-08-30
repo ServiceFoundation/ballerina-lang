@@ -21,6 +21,8 @@ import org.ballerinalang.launcher.BLauncherCmd;
 import org.ballerinalang.launcher.LauncherUtils;
 import org.ballerinalang.packerina.BuilderUtils;
 import org.ballerinalang.util.BLangConstants;
+import org.wso2.ballerinalang.compiler.ConsoleListener;
+import org.wso2.ballerinalang.compiler.ListenerRegistry;
 import org.wso2.ballerinalang.util.RepoUtils;
 import picocli.CommandLine;
 
@@ -76,6 +78,9 @@ public class BuildCommand implements BLauncherCmd {
         if (argList != null && argList.size() > 1) {
             throw LauncherUtils.createUsageException("too many arguments");
         }
+
+        // Register console listener
+        ListenerRegistry.registerListener("ConsoleListener", new ConsoleListener());
 
         // Get source root path.
         Path sourceRootPath = Paths.get(System.getProperty(USER_DIR));

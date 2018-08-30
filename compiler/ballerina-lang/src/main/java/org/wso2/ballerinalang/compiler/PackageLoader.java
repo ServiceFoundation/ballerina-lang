@@ -404,6 +404,7 @@ public class PackageLoader {
     private BLangPackage parse(PackageID pkgId, PackageSource pkgSource) {
         BLangPackage packageNode = this.parser.parse(pkgSource);
         packageNode.packageID = pkgId;
+        // Set the same packageId to the testable node
         if (packageNode.testableBLangPackage != null) {
             packageNode.testableBLangPackage.packageID = pkgId;
         }
@@ -434,7 +435,7 @@ public class PackageLoader {
             // Filter the tests files
             compiledPackage.srcEntries = srcPathStream
                     .filter(path -> Files.exists(path, LinkOption.NOFOLLOW_LINKS))
-                    .filter(path -> !"tests".equals(path.getParent().getFileName().toString()))
+                    .filter(path -> !isTestSource(path))
                     .map(projectPath::relativize)
                     .map(path -> new PathBasedCompiledPackageEntry(projectPath, path, CompilerOutputEntry.Kind.SRC))
                     .collect(Collectors.toList());
@@ -450,5 +451,16 @@ public class PackageLoader {
                     .ifPresent(pkgEntry -> compiledPackage.pkgMDEntry = pkgEntry);
         }
         return compiledPackage;
+    }
+
+    private boolean isTestSource(Path path) {
+        Path parentPath = path.getParent();
+        if (parentPath != null) {
+            Path fileName = parentPath.getFileName();
+            if (fileName != null) {
+                return ProjectDirConstants.TEST_DIR_NAME.equals(fileName.toString());
+            }
+        }
+        return false;
     }
 }
