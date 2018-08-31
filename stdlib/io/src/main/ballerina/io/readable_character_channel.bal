@@ -17,8 +17,9 @@
 documentation {
     Represents a channel which could be used to read/write characters through a given ByteChannel.
 }
-public type CharacterChannel object {
-    private ByteChannel channel;
+public type ReadableCharacterChannel object {
+
+    private ReadableByteChannel channel;
     private string charset;
 
     documentation {
@@ -37,7 +38,7 @@ public type CharacterChannel object {
         P{{byteChannel}} ByteChannel which should be used to initalize the character channel
         P{{cs}} Character-set (i.e UTF-8) which should be used to encode/decode
     }
-    extern function init(ByteChannel byteChannel, string cs);
+    extern function init(ReadableByteChannel byteChannel, string cs);
 
     documentation {
         Reads a given number of characters.
@@ -46,14 +47,6 @@ public type CharacterChannel object {
         R{{}} Content which is read or an error
     }
     public extern function read(@sensitive int numberOfChars) returns @tainted string|error;
-
-    documentation {
-        Writes a given sequence of characters (string).
-
-        P{{content}} Content which should be written
-        P{{startOffset}} Number of characters which should be offset when writing content
-    }
-    public extern function write(string content, int startOffset) returns int|error;
 
     documentation {
         Reads a json from the given channel.
@@ -68,22 +61,6 @@ public type CharacterChannel object {
         R{{}} Read xml or an error
     }
     public extern function readXml() returns @tainted xml|error;
-
-    documentation {
-        Writes a given json to the given channel.
-
-        P{{content}} The json which should be written
-        R{{}} If an error occurred while writing
-    }
-    public extern function writeJson(json content) returns error?;
-
-    documentation {
-        Writes a given xml to the channel.
-
-        P{{content}} The XML which should be written
-        R{{}} If an error occurred while writing
-    }
-    public extern function writeXml(xml content) returns error?;
 
     documentation {
         Closes a given character channel.

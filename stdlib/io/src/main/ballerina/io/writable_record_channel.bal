@@ -17,8 +17,8 @@
 documentation {
     Represents a channel which will allow to read/write records through a given CharacterChannel.
 }
-public type DelimitedTextRecordChannel object {
-    private CharacterChannel channel;
+public type WritableTextRecordChannel object {
+    private WritableCharacterChannel channel;
     private string rs;
     private string fs;
 
@@ -41,21 +41,8 @@ public type DelimitedTextRecordChannel object {
         P{{recordSeparator}} Record separator which will separate between records
         P{{fmt}} Format which will be used to represent the type of record i.e csv
     }
-    extern function init(CharacterChannel characterChannel, string fieldSeparator, string recordSeparator, string fmt);
-
-    documentation {
-        Checks whether there's a record left to be read.
-
-        R{{}} True if there's a record left to be read
-    }
-    public extern function hasNext() returns boolean;
-
-    documentation {
-        Get next record from the input/output resource.
-
-        R{{}} Set of fields included in the record or an error
-    }
-    public extern function getNext() returns @tainted string[]|error;
+    extern function init(WritableCharacterChannel characterChannel, string fieldSeparator,
+                         string recordSeparator, string fmt);
 
     documentation {
         Writes records to a given input/output resource.

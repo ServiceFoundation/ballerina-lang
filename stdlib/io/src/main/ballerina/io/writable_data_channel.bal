@@ -27,9 +27,9 @@ public type ByteOrder "BE";
 documentation {
     Represents a data channel for reading/writing data.
 }
-public type DataChannel object {
+public type WritableDataChannel object {
 
-    public new(ByteChannel byteChannel, ByteOrder bOrder = "BE") {
+    public new(WritableByteChannel byteChannel, ByteOrder bOrder = "BE") {
         init(byteChannel, bOrder);
     }
 
@@ -39,28 +39,7 @@ public type DataChannel object {
         P{{byteChannel}} channel which would represent the source to read/write data
         P{{bOrder}} network byte order
     }
-    extern function init(ByteChannel byteChannel, ByteOrder bOrder);
-
-    documentation {
-        Reads a 16 bit integer.
-
-        R{{}} value of the integer which is read or an error
-    }
-    public extern function readInt16() returns int|error;
-
-    documentation {
-        Reads a 32 bit integer.
-
-        R{{}} value of the integer which is read or an error
-    }
-    public extern function readInt32() returns int|error;
-
-    documentation {
-        Reads a 64 bit integer.
-
-        R{{}} value of the integer which is read or an error
-    }
-    public extern function readInt64() returns int|error;
+    extern function init(WritableByteChannel byteChannel, ByteOrder bOrder);
 
     documentation {
         Writes 16 bit integer.
@@ -87,20 +66,6 @@ public type DataChannel object {
     public extern function writeInt64(int value) returns error?;
 
     documentation {
-        Reads 32 bit float.
-
-        R{{}} value of the float which is read or an error
-    }
-    public extern function readFloat32() returns float|error;
-
-    documentation {
-        Reads 64 bit float.
-
-        R{{}} value of the float which is read or an error
-    }
-    public extern function readFloat64() returns float|error;
-
-    documentation {
         Writes 32 bit float.
 
         P{{value}}   float which will be written
@@ -117,28 +82,12 @@ public type DataChannel object {
     public extern function writeFloat64(float value) returns error?;
 
     documentation {
-        Reads 1 byte and convert it's value to boolean.
-
-        R{{}} boolean value which is read or an error
-    }
-    public extern function readBool() returns boolean|error;
-
-    documentation {
         Writes boolean.
 
         P{{value}}   boolean which will be written
         R{{}} nill if the content is written successfully or an error
     }
     public extern function writeBool(boolean value) returns error?;
-
-    documentation {
-        Reads string value represented through the provided number of bytes.
-
-        P{{nBytes}} specifies the number of bytes which represents the string
-        P{{encoding}} specifies the char-set encoding of the string
-        R{{}} value of the string or an error
-    }
-    public extern function readString(int nBytes, string encoding) returns string|error;
 
     documentation {
         Writes a given string value to the respective channel.
@@ -148,13 +97,6 @@ public type DataChannel object {
         R{{}} nill if the content is written successfully or an error
     }
     public extern function writeString(string value, string encoding) returns error?;
-
-    documentation {
-        Reads a variable length integer.
-
-        R{{}} value of the integer which is read or an error
-    }
-    public extern function readVarInt() returns int|error;
 
     documentation {
         Writes a given integer identifying the variable length.

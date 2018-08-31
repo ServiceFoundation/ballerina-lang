@@ -29,13 +29,14 @@ public type Mode "r"|"w"|"rw"|"a";
 @final public Mode APPEND = "a";
 
 documentation {
-    Retrieves a ByteChannel from a given file path.
+    Retrieves a ReadableByteChannel or WritableByteChannel from a given file path.
 
     P{{path}} Relative/absolute path string to locate the file
     P{{accessMode}} Permission to open the file
-    R{{}} ByteChannel representation of the file resource
+    R{{}} ReadableByteChannel or WritableByteChannel representation of the file resource
 }
-public extern function openFile(@sensitive string path, @sensitive Mode accessMode) returns @tainted ByteChannel;
+public extern function openFile(@sensitive string path,
+                                @sensitive Mode accessMode) returns @tainted ReadableByteChannel|ReadableByteChannel;
 
 documentation {
     Opens a secure socket connection with a remote server.
@@ -55,24 +56,24 @@ documentation {
     P{{content}} Content which should be exposed as channel
     R{{}} ByteChannel represenation to read the memory content
 }
-public extern function createMemoryChannel(byte[] content) returns ByteChannel;
+public extern function createReadableChannel(byte[] content) returns ReadableByteChannel;
 
-documentation {
-    Retrieves a CSV channel from a give file path.
-
-    P{{path}} File path which describes the location of the CSV
-    P{{mode}} Permission which should be used to open CSV file
-    P{{fieldSeparator}} CSV record seperator (i.e comma or tab)
-    P{{charset}} Encoding characters in the file represents
-    P{{skipHeaders}} Number of headers which should be skipped
-    R{{}} CSVChannel which could be used to iterate through the CSV records
-}
-public function openCsvFile(@sensitive string path,
-                            @sensitive Mode mode = "r",
-                            @sensitive Separator fieldSeparator = ",",
-                            @sensitive string charset = "UTF-8",
-                            @sensitive int skipHeaders = 0) returns @tainted CSVChannel {
-    ByteChannel channel = openFile(path, mode);
-    CharacterChannel charChannel = new(channel, charset);
-    return new CSVChannel(charChannel, fs = fieldSeparator, nHeaders = skipHeaders);
-}
+//documentation {
+//    Retrieves a CSV channel from a give file path.
+//
+//    P{{path}} File path which describes the location of the CSV
+//    P{{mode}} Permission which should be used to open CSV file
+//    P{{fieldSeparator}} CSV record seperator (i.e comma or tab)
+//    P{{charset}} Encoding characters in the file represents
+//    P{{skipHeaders}} Number of headers which should be skipped
+//    R{{}} CSVChannel which could be used to iterate through the CSV records
+//}
+//public function openCsvFile(@sensitive string path,
+//                            @sensitive Mode mode = "r",
+//                            @sensitive Separator fieldSeparator = ",",
+//                            @sensitive string charset = "UTF-8",
+//                            @sensitive int skipHeaders = 0) returns @tainted CSVChannel {
+//    ByteChannel channel = openFile(path, mode);
+//    CharacterChannel charChannel = new(channel, charset);
+//    return new CSVChannel(charChannel, fs = fieldSeparator, nHeaders = skipHeaders);
+//}

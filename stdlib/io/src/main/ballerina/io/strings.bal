@@ -18,7 +18,7 @@ documentation{
      Represents a reader which will wrap string content as a channel.
 }
 public type StringReader object {
-    private CharacterChannel? channel;
+    private ReadableCharacterChannel? channel;
 
     documentation{
       Constructs a channel to read string.
@@ -28,8 +28,8 @@ public type StringReader object {
     }
     public new(string content, string encoding = "UTF-8") {
         byte[] contentBytes = content.toByteArray(encoding);
-        ByteChannel byteChannel = createMemoryChannel(contentBytes);
-        channel = new CharacterChannel(byteChannel, encoding);
+        ReadableByteChannel byteChannel = createReadableChannel(contentBytes);
+        channel = new ReadableCharacterChannel(byteChannel, encoding);
     }
 
     documentation{
