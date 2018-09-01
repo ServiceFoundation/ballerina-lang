@@ -75,11 +75,11 @@ import org.wso2.ballerinalang.compiler.tree.BLangNodeVisitor;
 import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 import org.wso2.ballerinalang.compiler.tree.BLangResource;
 import org.wso2.ballerinalang.compiler.tree.BLangService;
+import org.wso2.ballerinalang.compiler.tree.BLangTestablePackage;
 import org.wso2.ballerinalang.compiler.tree.BLangTypeDefinition;
 import org.wso2.ballerinalang.compiler.tree.BLangVariable;
 import org.wso2.ballerinalang.compiler.tree.BLangWorker;
 import org.wso2.ballerinalang.compiler.tree.BLangXMLNS;
-import org.wso2.ballerinalang.compiler.tree.TestableBLangPackage;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangExpression;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangLiteral;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangSimpleVarRef;
@@ -194,8 +194,8 @@ public class SymbolEnter extends BLangNodeVisitor {
         pkgNode.completedPhases.add(CompilerPhase.DEFINE);
 
         // Visit testable node if not null
-        if (pkgNode.testableBLangPackage != null) {
-            visit(pkgNode.testableBLangPackage);
+        if (pkgNode.testablePackage != null) {
+            visit(pkgNode.testablePackage);
         }
     }
 
@@ -235,7 +235,7 @@ public class SymbolEnter extends BLangNodeVisitor {
         pkgNode.globalEndpoints.forEach(ep -> defineNode(ep, pkgEnv));
     }
 
-    public void visit(TestableBLangPackage pkgNode) {
+    public void visit(BLangTestablePackage pkgNode) {
         if (pkgNode.completedPhases.contains(CompilerPhase.DEFINE)) {
             return;
         }
@@ -793,7 +793,7 @@ public class SymbolEnter extends BLangNodeVisitor {
         compUnits.forEach(compUnit -> populateCompilationUnit(pkgNode, compUnit));
 
         // Populate testable node if not null
-        if (pkgNode.testableBLangPackage != null) {
+        if (pkgNode.testablePackage != null) {
             populateTestablePackageNode(pkgNode);
         }
     }
@@ -805,7 +805,7 @@ public class SymbolEnter extends BLangNodeVisitor {
      * @param pkgNode current package node
      */
     private void populateTestablePackageNode(BLangPackage pkgNode) {
-        List<BLangCompilationUnit> compUnits = pkgNode.testableBLangPackage.getCompilationUnits();
+        List<BLangCompilationUnit> compUnits = pkgNode.testablePackage.getCompilationUnits();
         compUnits.forEach(compUnit -> {
             // Get all imports from the compilation unit node
             List<TopLevelNode> importList = compUnit.getTopLevelNodes()
@@ -822,7 +822,7 @@ public class SymbolEnter extends BLangNodeVisitor {
             });
 
         });
-        compUnits.forEach(compUnit -> populateCompilationUnit(pkgNode.testableBLangPackage, compUnit));
+        compUnits.forEach(compUnit -> populateCompilationUnit(pkgNode.testablePackage, compUnit));
     }
 
     /**
