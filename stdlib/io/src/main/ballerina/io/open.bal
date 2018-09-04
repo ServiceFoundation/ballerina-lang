@@ -14,14 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-documentation {
-   Represents the set of permissions supported to open file.
-
-   READ - open the file in read mode
-   WRITE - open the file in write mode
-   READ/WRITE - open the file either to read or write
-   APPEND - append to existing file instead of replacing
-}
 public type Mode "r"|"w"|"rw"|"a";
 @final public Mode READ = "r";
 @final public Mode WRITE = "w";
@@ -29,14 +21,22 @@ public type Mode "r"|"w"|"rw"|"a";
 @final public Mode APPEND = "a";
 
 documentation {
-    Retrieves a ReadableByteChannel or WritableByteChannel from a given file path.
+    Retrieves a ReadableByteChannel from a given file path.
 
     P{{path}} Relative/absolute path string to locate the file
-    P{{accessMode}} Permission to open the file
-    R{{}} ReadableByteChannel or WritableByteChannel representation of the file resource
+    R{{}} ReadableByteChannel representation of the file resource
 }
-public extern function openFile(@sensitive string path,
-                                @sensitive Mode accessMode) returns @tainted ReadableByteChannel|ReadableByteChannel;
+public extern function openFileForReading(@sensitive string path) returns @tainted ReadableByteChannel;
+
+documentation {
+    Retrieves a WritableByteChannel from a given file path.
+
+    P{{path}} Relative/absolute path string to locate the file
+    P{{append}} Should the content be appended to the file
+    R{{}} WritableByteChannel representation of the file resource
+}
+public extern function openFileForWriting(@sensitive string path, boolean append = false)
+    returns @tainted WritableByteChannel;
 
 documentation {
     Opens a secure socket connection with a remote server.

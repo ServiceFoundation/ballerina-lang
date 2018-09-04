@@ -264,7 +264,7 @@ public type Entity object {
 
         P{{entityBody}} Entity body can be of type `string`,`xml`,`json`,`byte[]`,`io:ByteChannel` or `Entity[]`
     }
-    public function setBody(@sensitive string|xml|json|byte[]|io:ByteChannel|Entity[] entityBody);
+    public function setBody(@sensitive string|xml|json|byte[]|io:ReadableByteChannel|Entity[] entityBody);
 
     documentation {
         Sets the entity body with a given file. This method overrides any existing `content-type` headers
@@ -371,14 +371,15 @@ public type Entity object {
         P{{contentType}} Content-type to be used with the payload. This is an optional parameter.
                          `application/octet-stream` is used as the default value.
     }
-    public extern function setByteChannel(io:ByteChannel byteChannel, @sensitive string contentType = "application/octet-stream");
+    public extern function setByteChannel(io:ReadableByteChannel byteChannel,
+                                          @sensitive string contentType = "application/octet-stream");
 
     documentation {
         Given an entity, gets the entity body as a byte channel.
 
         R{{}} An `io:ByteChannel`. An `error` record will be returned in case of errors
     }
-    public extern function getByteChannel() returns @tainted io:ByteChannel|error;
+    public extern function getByteChannel() returns @tainted io:ReadableByteChannel|error;
 
     documentation {
         Given an entity, gets its body parts. If the entity body is not a set of body parts an error will be returned.
@@ -393,7 +394,7 @@ public type Entity object {
 
         R{{}} Body parts as a byte channel
     }
-    public extern function getBodyPartsAsChannel() returns @tainted io:ByteChannel;
+    public extern function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel;
 
     documentation {
         Sets body parts to entity. This method overrides any existing `content-type` headers
@@ -471,18 +472,18 @@ public type Entity object {
 };
 
 function Entity::setFileAsEntityBody(@sensitive string filePath,
-                                            @sensitive string contentType = "application/octet-stream") {
-    io:ByteChannel channel = io:openFile(filePath, READ_PERMISSION);
+                                     @sensitive string contentType = "application/octet-stream") {
+    io:ReadableByteChannel channel = io:openFileForReading(filePath);
     self.setByteChannel(channel, contentType = contentType);
 }
 
-function Entity::setBody(@sensitive (string|xml|json|byte[]|io:ByteChannel|Entity[]) entityBody) {
+function Entity::setBody(@sensitive (string|xml|json|byte[]|io:ReadableByteChannel|Entity[]) entityBody) {
     match entityBody {
         string textContent => self.setText(textContent);
         xml xmlContent => self.setXml(xmlContent);
         json jsonContent => self.setJson(jsonContent);
         byte[] blobContent => self.setByteArray(blobContent);
-        io:ByteChannel byteChannelContent => self.setByteChannel(byteChannelContent);
+        io:ReadableByteChannel byteChannelContent => self.setByteChannel(byteChannelContent);
         Entity[] bodyParts => self.setBodyParts(bodyParts);
     }
 }
@@ -498,8 +499,8 @@ documentation {
           If the given input is of type io:ByteChannel, an encoded `io:ByteChannel` is returned
           In case of errors, an `error` record is returned
 }
-extern function base64Encode((string|byte[]|io:ByteChannel) contentToBeEncoded, string charset = "utf-8")
-    returns (string|byte[]|io:ByteChannel|error);
+extern function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
+    returns (string|byte[]|io:ReadableByteChannel|error);
 
 documentation {
     Decodes a given input with MIME specific Base64 encoding scheme.
@@ -511,8 +512,8 @@ documentation {
           If the given input is of type io:ByteChannel, a decoded `io:ByteChannel` is returned
           In case of errors, an `error` record is returned
 }
-extern function base64Decode((string|byte[]|io:ByteChannel) contentToBeDecoded, string charset = "utf-8")
-    returns (string|byte[]|io:ByteChannel|error);
+extern function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
+    returns (string|byte[]|io:ReadableByteChannel|error);
 
 documentation {
     Encodes a given byte[] with Base64 encoding scheme.
@@ -525,7 +526,7 @@ public function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|error {
     match base64Encode(valueToBeEncoded) {
         string returnString => return customErr;
         byte[] returnBlob => return returnBlob;
-        io:ByteChannel returnChannel => return customErr;
+        io:ReadableByteChannel returnChannel => return customErr;
         error encodeErr => return encodeErr;
     }
 }
@@ -542,7 +543,7 @@ public function base64EncodeString(string valueToBeEncoded, string charset = "ut
     match base64Encode(valueToBeEncoded) {
         string returnString => return returnString;
         byte[] returnBlob => return customErr;
-        io:ByteChannel returnChannel => return customErr;
+        io:ReadableByteChannel returnChannel => return customErr;
         error encodeErr => return encodeErr;
     }
 }
@@ -553,12 +554,12 @@ documentation {
     P{{valueToBeEncoded}} Content that needs to be encoded
     R{{}} An encoded `io:ByteChannel`. In case of errors, an `error` record is returned
 }
-public function base64EncodeByteChannel(io:ByteChannel valueToBeEncoded) returns io:ByteChannel|error {
+public function base64EncodeByteChannel(io:ReadableByteChannel valueToBeEncoded) returns io:ReadableByteChannel|error {
     error customErr = {message:"Error occurred while encoding ByteChannel content"};
     match base64Encode(valueToBeEncoded) {
         string returnString => return customErr;
         byte[] returnBlob => return customErr;
-        io:ByteChannel returnChannel => return returnChannel;
+        io:ReadableByteChannel returnChannel => return returnChannel;
         error encodeErr => return encodeErr;
     }
 }
@@ -574,7 +575,7 @@ public function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|error {
     match base64Decode(valueToBeDecoded) {
         string returnString => return customErr;
         byte[] returnBlob => return returnBlob;
-        io:ByteChannel returnChannel => return customErr;
+        io:ReadableByteChannel returnChannel => return customErr;
         error decodeErr => return decodeErr;
     }
 }
@@ -591,7 +592,7 @@ public function base64DecodeString(string valueToBeDecoded, string charset = "ut
     match base64Decode(valueToBeDecoded) {
         string returnString => return returnString;
         byte[] returnBlob => return customErr;
-        io:ByteChannel returnChannel => return customErr;
+        io:ReadableByteChannel returnChannel => return customErr;
         error decodeErr => return decodeErr;
     }
 }
@@ -602,12 +603,12 @@ documentation {
     P{{valueToBeDecoded}} Content that needs to be decoded
     R{{}} A decoded `io:ByteChannel`. In case of errors, an `error` record is returned
 }
-public function base64DecodeByteChannel(io:ByteChannel valueToBeDecoded) returns io:ByteChannel|error {
+public function base64DecodeByteChannel(io:ReadableByteChannel valueToBeDecoded) returns io:ReadableByteChannel|error {
     error customErr = {message:"Error occurred while decoding ByteChannel content"};
     match base64Decode(valueToBeDecoded) {
         string returnString => return customErr;
         byte[] returnBlob => return customErr;
-        io:ByteChannel returnChannel => return returnChannel;
+        io:ReadableByteChannel returnChannel => return returnChannel;
         error decodeErr => return decodeErr;
     }
 }

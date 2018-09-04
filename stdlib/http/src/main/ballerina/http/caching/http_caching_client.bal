@@ -116,7 +116,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function post(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function post(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                         message) returns Response|error;
 
     documentation {
@@ -128,7 +128,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function head(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function head(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                         message = ()) returns Response|error;
 
     documentation {
@@ -140,7 +140,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function put(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function put(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                         message) returns Response|error;
 
     documentation {
@@ -153,8 +153,9 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function execute(string httpMethod, string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
-                                                                message) returns Response|error;
+    public function execute(string httpMethod, string path,
+                            Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|() message)
+                            returns Response|error;
 
     documentation {
         Responses returned for PATCH requests are not cacheable. Therefore, the requests are simply directed to
@@ -165,7 +166,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function patch(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function patch(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                         message) returns Response|error;
 
     documentation {
@@ -177,7 +178,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function delete(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function delete(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                             message) returns Response|error;
 
     documentation {
@@ -189,7 +190,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function get(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function get(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                         message = ()) returns Response|error;
 
     documentation {
@@ -201,7 +202,7 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} The response for the request or an `error` if failed to establish communication with the upstream server
     }
-    public function options(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+    public function options(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                             message = ()) returns Response|error;
 
     documentation {
@@ -223,8 +224,9 @@ public type HttpCachingClient object {
                      or `mime:Entity[]`
         R{{}} An `HttpFuture` that represents an asynchronous service invocation, or an error if the submission fails
     }
-    public function submit(string httpVerb, string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
-                                                            message) returns HttpFuture|error;
+    public function submit(string httpVerb, string path,
+                           Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|() message)
+                           returns HttpFuture|error;
 
     documentation {
         Retrieves the `Response` for a previously submitted request.
@@ -282,7 +284,7 @@ public function createHttpCachingClient(string url, ClientEndpointConfig config,
     return httpCachingClient;
 }
 
-function HttpCachingClient::post(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::post(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                        message) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
@@ -297,14 +299,14 @@ function HttpCachingClient::post(string path, Request|string|xml|json|byte[]|io:
     }
 }
 
-function HttpCachingClient::head(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::head(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                         message = ()) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
     return getCachedResponse(self.cache, self.httpClient, req, HEAD, path, self.cacheConfig.isShared);
 }
 
-function HttpCachingClient::put(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::put(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                         message) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
@@ -320,7 +322,8 @@ function HttpCachingClient::put(string path, Request|string|xml|json|byte[]|io:B
 }
 
 function HttpCachingClient::execute(string httpMethod, string path, Request|string|xml|json|byte[]|
-                                                    io:ByteChannel|mime:Entity[]|() message) returns Response|error {
+                                                    io:ReadableByteChannel|mime:Entity[]|() message)
+                                    returns Response|error {
     Request request = buildRequest(message);
     setRequestCacheControlHeader(request);
 
@@ -338,7 +341,7 @@ function HttpCachingClient::execute(string httpMethod, string path, Request|stri
     }
 }
 
-function HttpCachingClient::patch(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::patch(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                         message) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
@@ -353,7 +356,7 @@ function HttpCachingClient::patch(string path, Request|string|xml|json|byte[]|io
     }
 }
 
-function HttpCachingClient::delete(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::delete(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                         message) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
@@ -368,14 +371,14 @@ function HttpCachingClient::delete(string path, Request|string|xml|json|byte[]|i
     }
 }
 
-function HttpCachingClient::get(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::get(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                         message = ()) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
     return getCachedResponse(self.cache, self.httpClient, req, GET, path, self.cacheConfig.isShared);
 }
 
-function HttpCachingClient::options(string path, Request|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|()
+function HttpCachingClient::options(string path, Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|()
                                                             message = ()) returns Response|error {
     Request req = buildRequest(message);
     setRequestCacheControlHeader(req);
@@ -405,8 +408,9 @@ function HttpCachingClient::forward(string path, Request request) returns Respon
     }
 }
 
-function HttpCachingClient::submit(string httpVerb, string path, Request|string|xml|json|byte[]|io:ByteChannel
-                                                                            |mime:Entity[]|() message) returns HttpFuture|error {
+function HttpCachingClient::submit(string httpVerb, string path,
+                                   Request|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|() message)
+                                   returns HttpFuture|error {
     Request req = buildRequest(message);
     return self.httpClient.submit(httpVerb, path, req);
 }

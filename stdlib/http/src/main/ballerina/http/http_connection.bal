@@ -30,7 +30,8 @@ public type Connection object {
                      or `mime:Entity[]`
         R{{}} Returns an `error` if failed to respond
     }
-    public function respond(Response|string|xml|json|byte[]|io:ByteChannel|mime:Entity[]|() message) returns error? {
+    public function respond(Response|string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[]|() message)
+                            returns error? {
         Response response = buildResponse(message);
         match filterContext {
             FilterContext filterCtx => {

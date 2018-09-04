@@ -204,7 +204,7 @@ public type Request object {
 
         R{{}} A byte channel from which the message payload can be read or `error` in case of errors
     }
-    public function getByteChannel() returns io:ByteChannel|error;
+    public function getByteChannel() returns io:ReadableByteChannel|error;
 
     documentation {
         Gets the request payload as a `byte[]`.
@@ -290,7 +290,7 @@ public type Request object {
         P{{contentType}} The content type of the payload. Set this to override the default `content-type`
                          header value
     }
-    public function setByteChannel(io:ByteChannel payload, string contentType = "application/octet-stream");
+    public function setByteChannel(io:ReadableByteChannel payload, string contentType = "application/octet-stream");
 
     documentation {
         Sets the request payload.
@@ -298,7 +298,7 @@ public type Request object {
         P{{payload}} Payload can be of type `string`, `xml`, `json`, `byte[]`, `ByteChannel` or `Entity[]` (i.e: a set
                      of body parts)
     }
-    public function setPayload(string|xml|json|byte[]|io:ByteChannel|mime:Entity[] payload);
+    public function setPayload(string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[] payload);
 
     // For use within the package. Takes the Cache-Control header and parses it to a RequestCacheControl object.
     function parseCacheControlHeader();
@@ -422,13 +422,13 @@ function Request::getBinaryPayload() returns byte[]|error {
     }
 }
 
-function Request::getByteChannel() returns io:ByteChannel|error {
+function Request::getByteChannel() returns io:ReadableByteChannel|error {
     match self.getEntity() {
         error err => return err;
         mime:Entity mimeEntity => {
             match mimeEntity.getByteChannel() {
                 error payloadErr => return payloadErr;
-                io:ByteChannel byteChannel => return byteChannel;
+                io:ReadableByteChannel byteChannel => return byteChannel;
             }
         }
     }
@@ -513,19 +513,19 @@ function Request::setFileAsPayload(string filePath, @sensitive string contentTyp
     self.setEntity(entity);
 }
 
-function Request::setByteChannel(io:ByteChannel payload, string contentType = "application/octet-stream") {
+function Request::setByteChannel(io:ReadableByteChannel payload, string contentType = "application/octet-stream") {
     mime:Entity entity = self.getEntityWithoutBody();
     entity.setByteChannel(payload, contentType = contentType);
     self.setEntity(entity);
 }
 
-function Request::setPayload(string|xml|json|byte[]|io:ByteChannel|mime:Entity[] payload) {
+function Request::setPayload(string|xml|json|byte[]|io:ReadableByteChannel|mime:Entity[] payload) {
     match payload {
         string textContent => self.setTextPayload(textContent);
         xml xmlContent => self.setXmlPayload(xmlContent);
         json jsonContent => self.setJsonPayload(jsonContent);
         byte[] blobContent => self.setBinaryPayload(blobContent);
-        io:ByteChannel byteChannelContent => self.setByteChannel(byteChannelContent);
+        io:ReadableByteChannel byteChannelContent => self.setByteChannel(byteChannelContent);
         mime:Entity[] bodyParts => self.setBodyParts(bodyParts);
     }
 }
